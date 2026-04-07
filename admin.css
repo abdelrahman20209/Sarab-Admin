@@ -1,0 +1,474 @@
+/* --- تجميل قسم إدارة المنتجات (SARAB Premium Admin) --- */
+
+.admin-panel {
+  background: #0b0b0b;
+  border: 1px solid #1a1a1a;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  margin-bottom: 40px;
+}
+
+.panel-header h2 {
+  color: #fff;
+  font-size: 1.8rem;
+  margin-bottom: 5px;
+  border-right: 4px solid #e30613; /* بصمة سراب */
+  padding-right: 15px;
+}
+
+.panel-header p {
+  color: #666;
+  margin-bottom: 25px;
+  font-size: 0.95rem;
+}
+
+/* تنسيق الحقول */
+.form-group label {
+  display: block;
+  color: #aaa;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.qovox-form input[type="text"],
+.qovox-form input[type="number"],
+.qovox-form select,
+.qovox-form textarea {
+  width: 100%;
+  background: #151515;
+  border: 1px solid #222;
+  color: #fff;
+  padding: 12px 15px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.qovox-form input:focus,
+.qovox-form select:focus,
+.qovox-form textarea:focus {
+  border-color: #e30613;
+  outline: none;
+  background: #1a1a1a;
+  box-shadow: 0 0 10px rgba(227, 6, 19, 0.1);
+}
+
+/* الصفوف المتعددة */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* رفع الملفات (Image Upload) */
+.file-upload-wrapper {
+  transition: all 0.3s ease;
+  border: 2px dashed #333 !important;
+}
+
+.file-upload-wrapper:hover {
+  border-color: #e30613 !important;
+  background: #1a1a1a !important;
+}
+
+.upload-design i {
+  font-size: 2rem;
+  color: #e30613;
+  display: block;
+  margin-bottom: 10px;
+}
+
+/* قسم تفاصيل العرض (الخلفية الغامقة) */
+.details-section {
+  background: rgba(227, 6, 19, 0.03) !important;
+  border: 1px solid #300 !important;
+}
+
+.details-section h3 {
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* زر الإضافة */
+.submit-btn {
+  width: 100%;
+  background: linear-gradient(45deg, #860000, #e30613);
+  color: white;
+  border: none;
+  padding: 15px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 20px;
+}
+
+.submit-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 20px rgba(227, 6, 19, 0.4);
+}
+
+/* --- إدارة المنتجات الحالية (Grid) --- */
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+  margin-top: 30px;
+}
+
+.product-admin-card {
+  background: #111;
+  border-radius: 15px;
+  overflow: hidden;
+  border: 1px solid #222;
+  transition: 0.3s;
+}
+
+.product-admin-card:hover {
+  border-color: #e30613;
+}
+
+.product-admin-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  filter: grayscale(20%);
+}
+
+.card-content {
+  padding: 15px;
+}
+
+.card-content h4 {
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.card-actions {
+  display: flex;
+  gap: 10px;
+  padding: 10px 15px;
+  background: #0a0a0a;
+}
+
+.edit-btn,
+.delete-btn {
+  flex: 1;
+  padding: 8px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: 0.3s;
+}
+
+.edit-btn {
+  background: #333;
+  color: #fff;
+}
+.edit-btn:hover {
+  background: #444;
+}
+
+.delete-btn {
+  background: rgba(227, 6, 19, 0.1);
+  color: #e30613;
+}
+.delete-btn:hover {
+  background: #e30613;
+  color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+/* --- قسم الإحصائيات (Sarab Analytics Dashboard) --- */
+
+#statisticsSection {
+  padding: 20px;
+  background: #050505; /* أغمق درجة لمزيد من الفخامة */
+}
+
+/* توزيع الكروت العلوية */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: #111;
+  padding: 20px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border: 1px solid #222;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.stat-card i {
+  font-size: 2.5rem;
+  padding: 15px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* ألوان الحدود والأيقونات */
+.gold-border {
+  border-right: 4px solid #ffd700;
+}
+.gold-border i {
+  color: #ffd700;
+}
+
+.blue-border {
+  border-right: 4px solid #00a8ff;
+}
+.blue-border i {
+  color: #00a8ff;
+}
+
+.green-border {
+  border-right: 4px solid #00d2d3;
+}
+.green-border i {
+  color: #00d2d3;
+}
+
+.stat-card h3 {
+  font-size: 1.6rem;
+  margin: 0;
+  color: #fff;
+}
+
+.stat-card p {
+  color: #888;
+  margin: 5px 0 0 0;
+  font-size: 0.9rem;
+}
+
+/* حاوية الشارتات */
+.charts-container {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr; /* الشارت الأساسي أكبر */
+  gap: 25px;
+}
+
+.main-chart-wrapper,
+.chart-box {
+  background: #111;
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid #1a1a1a;
+}
+
+.main-chart-wrapper h3,
+.chart-box h3 {
+  color: #eee;
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.secondary-charts {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* أزرار الفلترة الزمنية */
+.time-filters .filter-btn {
+  background: #222;
+  border: 1px solid #333;
+  color: #888;
+  padding: 5px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: 0.3s;
+}
+
+.time-filters .filter-btn.active {
+  background: #e30613;
+  color: white;
+  border-color: #e30613;
+  box-shadow: 0 0 10px rgba(227, 6, 19, 0.3);
+}
+
+/* تحسين شكل المودال (النافذة المنبثقة) */
+.modal-content {
+  background: #111;
+  border: 1px solid #e30613;
+  color: #fff;
+  border-radius: 15px;
+  max-width: 500px;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+}
+
+.save-btn {
+  background: #e30613;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+/* Responsive للجوال */
+@media (max-width: 1024px) {
+  .charts-container {
+    grid-template-columns: 1fr;
+  }
+}
+.customers-section {
+  padding: 20px;
+  background: #000;
+  border-radius: 15px;
+  margin-top: 20px;
+}
+.table-container {
+  background: #111;
+  border-radius: 12px;
+  padding: 15px;
+  border: 1px solid #222;
+  overflow-x: auto;
+}
+#customersTable {
+  width: 100%;
+  border-collapse: collapse;
+  color: #fff;
+  text-align: right;
+}
+#customersTable th {
+  padding: 12px;
+  border-bottom: 2px solid #e30613;
+  color: #888;
+}
+#customersTable td {
+  padding: 12px;
+  border-bottom: 1px solid #222;
+}
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+}
+.status-delivered {
+  background: rgba(46, 204, 113, 0.2);
+  color: #2ecc71;
+}
+.status-pending {
+  background: rgba(241, 196, 15, 0.2);
+  color: #f1c40f;
+}
+
+/* كود التحكم في ظهور الأقسام (Tabs Logic) */
+.content-section {
+  display: none;
+}
+.content-section.active {
+  display: block;
+  animation: fadeIn 0.4s ease-in-out;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.sidebar ul li {
+  cursor: pointer;
+}
+.hidden-fade {
+  display: none;
+}
+.checkbox-group {
+  margin: 15px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  background: #1a1a1a;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #333;
+}
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+.check-item input {
+  width: 18px;
+  height: 18px;
+  accent-color: #e30613;
+  cursor: pointer;
+}
+.details-section {
+  background: #111;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #e30613;
+  margin-top: 25px;
+}
+.details-section h3 {
+  color: #e30613;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+textarea {
+  width: 100%;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  resize: vertical;
+  min-height: 80px;
+}
+#detailsModal .modal-content {
+  max-width: 800px;
+  background: #111;
+  border: 1px solid #860000;
+  color: white;
+}
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+.details-card {
+  background: #1a1a1a;
+  padding: 15px;
+  border-radius: 8px;
+  border-right: 4px solid #860000;
+}
+.product-item-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #333;
+}

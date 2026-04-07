@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Page | Hallow BNK</title>
+    <link rel="icon" type="image/png" href="img/LOGO.png" />
+    <link rel="stylesheet" href="admin.css" />
+    <link rel="stylesheet" href="admin2.css" />
+    <link rel="stylesheet" href="stats.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="admin-container">
+      <aside class="sidebar">
+        <div class="logo">
+          <h2>SARAB <span>Admin</span></h2>
+        </div>
+        <nav>
+          <ul id="mainMenu">
+            <li class="active" data-section="ordersSection">
+              <i class="fas fa-shopping-cart"></i> <span>الطلبات الواردة</span>
+            </li>
+            <li data-section="productsSection">
+              <i class="fas fa-box"></i> <span>إدارة المنتجات</span>
+            </li>
+            <li data-section="customersSection">
+              <i class="fas fa-users"></i> <span>العملاء</span>
+            </li>
+            <li data-section="statisticsSection">
+              <i class="fas fa-chart-line"></i> <span>الإحصائيات</span>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <main class="main-content">
+        <div id="ordersSection" class="content-section active">
+          <header>
+            <div class="header-title">
+              <h1>إدارة الطلبات</h1>
+              <p>متابعة وتحديث حالات طلبات العملاء</p>
+            </div>
+            <div class="admin-profile">
+              <span> BNKK مرحباً،</span><i class="fas fa-user-shield"></i>
+            </div>
+          </header>
+          <section class="stats-grid">
+            <div class="stat-card">
+              <i class="fas fa-clock"></i>
+              <div>
+                <h3 id="pendingCount">0</h3>
+                <p>طلبات معلقة</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <i class="fas fa-truck"></i>
+              <div>
+                <h3 id="shippingCount">0</h3>
+                <p>تحت الشحن</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <i class="fas fa-check-circle"></i>
+              <div>
+                <h3 id="completedCount">0</h3>
+                <p>طلبات مكتملة</p>
+              </div>
+            </div>
+          </section>
+          <section class="orders-section">
+            <div class="table-header">
+              <h2>قائمة الطلبات الأخيرة</h2>
+              <button
+                class="refresh-btn"
+                id="refreshOrders"
+                onclick="location.reload()"
+              >
+                <i class="fas fa-sync"></i> تحديث
+              </button>
+            </div>
+            <div class="table-wrapper">
+              <table id="ordersTable">
+                <thead>
+                  <tr>
+                    <th>كود الطلب</th>
+                    <th>العميل</th>
+                    <th>التفاصيل</th>
+                    <th>الإجمالي</th>
+                    <th>حالة الطلب</th>
+                    <th>موعد الوصول</th>
+                    <th>إجراءات</th>
+                  </tr>
+                </thead>
+                <tbody id="ordersBody">
+                  <tr>
+                    <td colspan="7" style="text-align: center; padding: 20px">
+                      <i class="fas fa-spinner fa-spin"></i> جاري اتصال سحابي بـ
+                      Firebase...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <div
+            id="editModal"
+            class="modal"
+            style="
+              display: none;
+              position: fixed;
+              z-index: 9999;
+              left: 0;
+              top: 0;
+              width: 100%;
+              height: 100%;
+              background-color: rgba(0, 0, 0, 0.8);
+            "
+          >
+            <div
+              class="modal-content"
+              style="
+                background-color: #1a1a1a;
+                margin: 10% auto;
+                padding: 20px;
+                border: 1px solid #e30613;
+                width: 90%;
+                max-width: 400px;
+                border-radius: 10px;
+                color: white;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  border-bottom: 1px solid #333;
+                  padding-bottom: 10px;
+                  margin-bottom: 20px;
+                "
+              >
+                <h3 style="margin: 0">
+                  تعديل حالة الطلب
+                  <span id="modalOrderId" style="color: #e30613"></span>
+                </h3>
+                <span
+                  class="close-modal"
+                  onclick="window.closeModal()"
+                  style="cursor: pointer; font-size: 24px"
+                  >&times;</span
+                >
+              </div>
+
+              <form id="editOrderForm">
+                <div style="margin-bottom: 15px">
+                  <label style="display: block; margin-bottom: 8px"
+                    >حالة الطلب الجديدة:</label
+                  >
+                  <select
+                    id="statusSelect"
+                    style="
+                      width: 100%;
+                      padding: 10px;
+                      background: #222;
+                      color: white;
+                      border: 1px solid #444;
+                      border-radius: 5px;
+                    "
+                  >
+                    <option value="pending_payment">انتظار الدفع</option>
+                    <option value="paid">تم الدفع</option>
+                    <option value="shipped">تم الشحن</option>
+                    <option value="on_the_way">في الطريق</option>
+                    <option value="delivered">وصل لحضراتكم</option>
+                  </select>
+                </div>
+
+                <div style="margin-bottom: 20px">
+                  <label style="display: block; margin-bottom: 8px"
+                    >موعد الوصول (بالأيام):</label
+                  >
+                  <input
+                    type="number"
+                    id="etaInput"
+                    placeholder="مثال: 3"
+                    style="
+                      width: 100%;
+                      padding: 10px;
+                      background: #222;
+                      color: white;
+                      border: 1px solid #444;
+                      border-radius: 5px;
+                    "
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  style="
+                    width: 100%;
+                    padding: 12px;
+                    background: #e30613;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-weight: bold;
+                  "
+                >
+                  حفظ التعديلات
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div id="productsSection" class="content-section">
+          <header>
+            <h1>إدارة منتجات "سراب"</h1>
+            <p>أهلاً بك يا مستر بنك في لوحة تحكم سراب</p>
+          </header>
+
+          <section class="admin-panel">
+            <div class="panel-header">
+              <h2>إضافة منتج جديد</h2>
+              <p>تحكم في أماكن العرض، الأسعار، والخصومات من مكان واحد.</p>
+            </div>
+
+            <form id="productForm" class="qovox-form">
+              <div class="form-group">
+                <label>اسم المنتج</label>
+                <input
+                  type="text"
+                  id="prodName"
+                  placeholder="مثلاً: عود القصر الملكي"
+                  required
+                />
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>السعر الأصلي (ج.م)</label>
+                  <input
+                    type="number"
+                    id="prodPrice"
+                    placeholder="0.00"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label>هل يوجد خصم؟</label>
+                  <select id="hasDiscount">
+                    <option value="no">لا يوجد</option>
+                    <option value="yes">نعم، يوجد خصم</option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="discountSection" class="form-group hidden-fade">
+                <label>نسبة الخصم (%)</label>
+                <input
+                  type="number"
+                  id="prodDiscount"
+                  placeholder="20"
+                  min="0"
+                  max="100"
+                  value="0"
+                />
+                <small id="pricePreview"></small>
+              </div>
+
+              <div class="form-group">
+                <label>أماكن عرض المنتج</label>
+                <div class="checkbox-group">
+                  <div class="check-item">
+                    <input type="checkbox" id="showInStore" checked />
+                    <label for="showInStore" style="color: #fff"
+                      >عرض في المتجر الأساسي</label
+                    >
+                  </div>
+                  <div class="check-item">
+                    <input type="checkbox" id="showInOffers" />
+                    <label for="showInOffers" style="color: #fff"
+                      >إضافة للعروض الحصرية ✨</label
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>حالة التوفر</label>
+                  <select id="prodStatus">
+                    <option value="true">متوفر حالياً ✅</option>
+                    <option value="false">نفذت الكمية ❌</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>الكمية المتاحة (المخزون)</label>
+                  <input
+                    type="number"
+                    id="prodStock"
+                    placeholder="50"
+                    value="0"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>صورة المنتج</label>
+                <div
+                  class="file-upload-wrapper"
+                  style="
+                    position: relative;
+                    background: #151515;
+                    border: 2px dashed #333;
+                    padding: 20px;
+                    text-align: center;
+                    border-radius: 8px;
+                  "
+                >
+                  <input
+                    type="file"
+                    id="prodImage"
+                    accept="image/*"
+                    style="
+                      opacity: 0;
+                      position: absolute;
+                      width: 100%;
+                      height: 100%;
+                      cursor: pointer;
+                      left: 0;
+                      top: 0;
+                    "
+                  />
+                  <div class="upload-design">
+                    <i>📷</i> <span>اضغط هنا لاختيار صورة العطر</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="details-section">
+                <h3>بطاقة تعريف المنتج (تفاصيل العرض)</h3>
+                <div class="form-group">
+                  <label>مناسب لمن؟</label>
+                  <select id="prodGender">
+                    <option value="unisex">للجنسين (الكل)</option>
+                    <option value="men">رجالي فقط</option>
+                    <option value="women">حريمي فقط</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>وصف الرائحة (النوتات العطرية)</label>
+                  <textarea
+                    id="prodDescription"
+                    placeholder="مثلاً: افتتاحية من الهيل، قلب من الياسمين..."
+                  ></textarea>
+                </div>
+                <div class="form-group">
+                  <label>حجم العبوة (مل)</label>
+                  <input type="text" id="prodSize" placeholder="مثلاً: 100ml" />
+                </div>
+              </div>
+
+              <div
+                id="statusMessage"
+                style="margin: 15px 0; font-weight: bold; text-align: center"
+              ></div>
+              <button type="submit" id="addBtn" class="submit-btn">
+                إضافة المنتج 🚀
+              </button>
+            </form>
+          </section>
+
+          <section class="manage-products">
+            <div class="panel-header">
+              <br />
+              <h2>إدارة المنتجات الحالية</h2>
+              <p>هنا يمكنك تعديل تفاصيل العطور أو حذفها نهائياً.</p>
+            </div>
+            <div id="admin-products-list" class="admin-grid"></div>
+          </section>
+        </div>
+
+        <div id="customersSection" class="content-section">
+          <header>
+            <h1>سجل العملاء</h1>
+            <p>قائمة كاملة بكل من تعامل مع "سراب"</p>
+          </header>
+          <div class="table-container">
+            <table id="customersTable">
+              <thead>
+                <tr>
+                  <th>الرقم المرجعي</th>
+                  <th>العميل</th>
+                  <th>التواصل</th>
+                  <th>العنوان</th>
+                  <th>الإجمالي</th>
+                  <th>الحالة</th>
+                </tr>
+              </thead>
+              <tbody id="customersTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="statisticsSection" class="content-section">
+          <header>
+            <h1>تحليلات الأداء | Analytics</h1>
+            <p>نظرة عامة على نمو "سراب" بالأرقام</p>
+          </header>
+          <section class="stats-grid">
+            <div class="stat-card gold-border">
+              <i class="fas fa-hand-holding-usd"></i>
+              <div>
+                <h3 id="totalRevenue">0 ج.م</h3>
+                <p>إجمالي الإيرادات</p>
+              </div>
+            </div>
+            <div class="stat-card blue-border">
+              <i class="fas fa-users"></i>
+              <div>
+                <h3 id="totalCustomers">0</h3>
+                <p>آخر الطلبات</p>
+              </div>
+            </div>
+            <div class="stat-card green-border">
+              <i class="fas fa-shopping-basket"></i>
+              <div>
+                <h3 id="avgOrderValue">0 ج.م</h3>
+                <p>متوسط الطلب</p>
+              </div>
+            </div>
+          </section>
+          <div class="charts-container">
+            <div class="main-chart-wrapper">
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 15px;
+                "
+              >
+                <h3>📈 منحنى المبيعات</h3>
+                <div class="time-filters">
+                  <button
+                    class="filter-btn active"
+                    onclick="changeTimeRange('7days', this)"
+                  >
+                    أسبوع
+                  </button>
+                  <button
+                    class="filter-btn"
+                    onclick="changeTimeRange('month', this)"
+                  >
+                    شهر
+                  </button>
+                </div>
+              </div>
+              <canvas id="salesChart"></canvas>
+            </div>
+            <div class="secondary-charts">
+              <div class="chart-box">
+                <h3>🏆 الأكثر مبيعاً</h3>
+                <canvas id="productsPieChart"></canvas>
+              </div>
+              <div class="chart-box">
+                <h3>📍 حالات الطلبات</h3>
+                <canvas id="orderStatusChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div id="detailsModal" class="modal">
+      <div class="modal-content">
+        <span class="close-details">&times;</span>
+        <h2>📋 تفاصيل الطلب</h2>
+        <div id="orderDetailsContent"></div>
+      </div>
+    </div>
+    <script type="module">
+      // 1. استدعاء الملفات باستخدام المسار النسبي لضمان عملها في الـ Root
+     // 1. استدعاء الملفات باستخدام المسار النسبي الصحيح
+      import "./js/admin2.js";
+      import { allOrders } from "./js/admin2.js";
+      // التعديل هنا: أضفنا /js/ قبل اسم الملف
+      import { updateRealStats } from "./js/stats.js";
+      // تثبيت البيانات في النافذة العامة لسهولة الوصول إليها من أي مكان
+      window.allOrders = allOrders;
+
+      // 1. دالة عرض العملاء المارنة (تم تحديثها لتفتيش الحقول العميقة)
+      function renderCustomersPage() {
+        const tableBody = document.getElementById("customersTableBody");
+        const orders = window.allOrders || allOrders;
+
+        if (!tableBody) return;
+
+        if (!orders || orders.length === 0) {
+          tableBody.innerHTML =
+            '<tr><td colspan="6" style="text-align:center; padding:20px;">جاري سحب بيانات العملاء... تأكد من اتصال Firebase</td></tr>';
+          return;
+        }
+
+        tableBody.innerHTML = "";
+        orders.forEach((order) => {
+          // --- محرك فحص الحقول الذكي (حل مشكلة الـ undefined) ---
+
+          // البحث عن الاسم في المستوى الأول أو داخل customerInfo
+          const name =
+            order.customerName ||
+            (order.customerInfo && order.customerInfo.name) ||
+            order.name ||
+            "عميل غير مسجل";
+
+          // البحث عن الهاتف في المستوى الأول أو داخل customerInfo
+          const phone =
+            order.customerPhone ||
+            (order.customerInfo && order.customerInfo.phone) ||
+            order.phone ||
+            "---";
+
+          // البحث عن العنوان أو المدينة
+          const address =
+            order.address ||
+            (order.customerInfo && order.customerInfo.address) ||
+            order.customerCity ||
+            (order.customerInfo && order.customerInfo.city) ||
+            "---";
+
+          // البحث عن السعر (totalPrice أو totalAmount أو total)
+          const price =
+            order.totalPrice || order.totalAmount || order.total || 0;
+
+          const id =
+            order.id ||
+            order.orderId ||
+            Math.random().toString(36).substr(2, 9);
+          const status = order.status || "pending";
+
+          const row = document.createElement("tr");
+          row.innerHTML = `
+                <td style="color: #e30613; font-family: monospace;">#${id.toString().substring(0, 8)}</td>
+                <td><b style="color: #fff;">${name}</b></td>
+                <td dir="ltr">${phone}</td>
+                <td class="text-truncate" title="${address}">${address}</td>
+                <td style="color: #ffd700;">${Number(price).toLocaleString()} ج.م</td>
+                <td><span class="status-badge ${status}">${status}</span></td>
+            `;
+          tableBody.appendChild(row);
+        });
+      }
+
+      // 2. نظام التبديل الذكي بين الأقسام
+      const menuItems = document.querySelectorAll("#mainMenu li");
+      const sections = document.querySelectorAll(".content-section");
+
+      menuItems.forEach((item) => {
+        item.addEventListener("click", () => {
+          const targetId = item.getAttribute("data-section");
+
+          // تحديث الشكل الخارجي للمنيو والأقسام
+          menuItems.forEach((i) => i.classList.remove("active"));
+          sections.forEach((s) => s.classList.remove("active"));
+          item.classList.add("active");
+
+          const activeSection = document.getElementById(targetId);
+          if (activeSection) activeSection.classList.add("active");
+
+          // تشغيل الوظائف البرمجية لكل قسم عند فتحه
+          if (targetId === "statisticsSection") {
+            setTimeout(() => {
+              if (typeof updateRealStats === "function")
+                updateRealStats("7days");
+            }, 200);
+          }
+          if (targetId === "customersSection") {
+            renderCustomersPage();
+          }
+        });
+      });
+
+      // دالة تغيير الفلتر الزمني للإحصائيات
+      window.changeTimeRange = (range, btn) => {
+        document
+          .querySelectorAll(".filter-btn")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        if (typeof updateRealStats === "function") updateRealStats(range);
+      };
+
+      // 3. المحرك الابتدائي (Initialization Loop)
+      let initAttempts = 0;
+      function init() {
+        const orders = window.allOrders || allOrders;
+        if (orders && orders.length > 0) {
+          console.log("✅ البيانات وصلت: جاري عرض لوحة التحكم.");
+          renderCustomersPage();
+
+          const statsSection = document.getElementById("statisticsSection");
+          if (statsSection && statsSection.classList.contains("active")) {
+            if (typeof updateRealStats === "function") updateRealStats("7days");
+          }
+        } else if (initAttempts < 15) {
+          initAttempts++;
+          setTimeout(init, 1000);
+        }
+      }
+
+      init();
+
+      // استماع لحدث تحديث البيانات من admin2.js لضمان التزامن اللحظي
+      window.addEventListener("ordersUpdated", () => {
+        const customerSec = document.getElementById("customersSection");
+        if (customerSec && customerSec.classList.contains("active")) {
+          renderCustomersPage();
+        }
+      });
+
+      // إغلاق مودال التفاصيل
+      document
+        .querySelector(".close-details")
+        ?.addEventListener("click", () => {
+          const modal = document.getElementById("detailsModal");
+          if (modal) modal.style.display = "none";
+        });
+    </script>
+  </body>
+</html>

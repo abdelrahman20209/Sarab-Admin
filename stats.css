@@ -1,0 +1,184 @@
+/* stats.css - لوحة تحكم سراب الاحترافية */
+
+:root {
+  --primary-red: #e30613;
+  --dark-red: #860000;
+  --gold: #ffd700;
+  --bg-dark: #0a0a0a;
+  --card-bg: #111111;
+  --border-color: #333333;
+  --text-gray: #aaaaaa;
+}
+
+/* تحسين شكل القسم ككل */
+#statisticsSection {
+  padding: 20px;
+  background-color: var(--bg-dark);
+}
+
+#statisticsSection header h1 {
+  font-size: 1.8rem;
+  color: #fff;
+  margin-bottom: 5px;
+  border-right: 4px solid var(--primary-red);
+  padding-right: 15px;
+}
+
+#statisticsSection header p {
+  color: var(--text-gray);
+  margin-bottom: 30px;
+}
+
+/* كروت الأرقام بتنسيق فخم */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  padding: 25px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--primary-red);
+}
+
+.stat-card i {
+  font-size: 2.5rem;
+  opacity: 0.8;
+}
+
+.stat-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 5px;
+  color: #fff;
+}
+
+.stat-card p {
+  font-size: 0.9rem;
+  color: var(--text-gray);
+}
+
+/* ألوان الحدود للكروت */
+.gold-border {
+  border-bottom: 4px solid var(--gold);
+}
+.blue-border {
+  border-bottom: 4px solid #3498db;
+}
+.green-border {
+  border-bottom: 4px solid #2ecc71;
+}
+
+/* حاويات الرسوم البيانية */
+.charts-container {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.main-chart-wrapper {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.secondary-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+}
+
+.chart-box {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  border-radius: 20px;
+  min-height: 350px;
+}
+
+.main-chart-wrapper h3,
+.chart-box h3 {
+  color: var(--primary-red);
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* تحسين شكل الـ Canvas */
+canvas {
+  width: 100% !important;
+  max-height: 400px;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .secondary-charts {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* أنيميشن الدخول */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.content-section.active {
+  animation: slideUp 0.5s ease forwards;
+}
+.time-filters .filter-btn {
+  background: #1a1a1a;
+  color: #888;
+  border: 1px solid #333;
+  padding: 5px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.time-filters .filter-btn:hover {
+  border-color: #e30613;
+  color: #fff;
+}
+
+.time-filters .filter-btn.active {
+  background: #e30613;
+  color: #fff;
+  border-color: #e30613;
+  box-shadow: 0 0 10px rgba(227, 6, 19, 0.3);
+}
+
+/* تحسين شكل الـ Stats Cards في قسم الإحصائيات */
+.gold-border {
+  border-top: 4px solid #ffd700;
+}
+.blue-border {
+  border-top: 4px solid #3498db;
+}
+.green-border {
+  border-top: 4px solid #2ecc71;
+}
