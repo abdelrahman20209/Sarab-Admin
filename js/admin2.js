@@ -1,3 +1,4 @@
+// 1. استيراد المكتبات
 import {
   initializeApp,
   getApps,
@@ -16,9 +17,11 @@ import {
   getAuth,
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-// التعديل الوحيد هنا: إضافة ./ لأن الملفين بجوار بعضهما في مجلد js
+
+// استيراد دالة الإحصائيات
 import { updateRealStats } from "./stats.js"; 
 
+// 2. الإعدادات
 const firebaseConfig = {
   apiKey: "AIzaSyD46OEVC7BJZPihUmeWSlMmMjmMoXorn1o",
   authDomain: "sarab-store.firebaseapp.com",
@@ -35,13 +38,17 @@ const auth = getAuth(app);
 export let allOrders = [];
 let currentEditingId = null;
 
+// 3. مراقبة حالة تسجيل الدخول
 onAuthStateChanged(auth, (user) => {
   if (user) {
     loadOrders();
-    setupEventListeners(); // تشغيل المستمعات فور التأكد من تسجيل الدخول
+    setupEventListeners(); 
+  } else {
+      console.warn("⚠️ لم يتم تسجيل الدخول بصلاحيات الإدارة");
   }
 });
 
+// 4. تحميل الطلبات وتحديث العدادات
 function loadOrders() {
   const ordersQuery = query(
     collection(db, "orders"),
@@ -50,38 +57,41 @@ function loadOrders() {
 
   onSnapshot(ordersQuery, (snapshot) => {
     const ordersBody = document.getElementById("ordersBody");
+    if (!ordersBody) return;
+
     allOrders = [];
-    let pending = 0,
-      shipping = 0,
-      completed = 0;
+    let pending = 0, shipping = 0, completed = 0;
 
     snapshot.forEach((docSnap) => {
       const order = docSnap.data();
       const id = docSnap.id;
       allOrders.push({ id, ...order });
 
-      if (order.status === "pending_payment") pending++;
-      if (order.status === "shipped" || order.status === "on_the_way")
-        shipping++;
+      // حساب العدادات بناءً على حالة الطلب
+      if (order.status === "pending_payment" || order.status === "pending") pending++;
+      if (order.status === "shipped" || order.status === "on_the_way") shipping++;
       if (order.status === "delivered") completed++;
     });
 
     renderMainOrdersTable(allOrders);
+    
+    // تصدير البيانات للنافذة العالمية
     window.allOrders = allOrders;
-    window.dispatchEvent(
-      new CustomEvent("ordersUpdated", { detail: allOrders }),
-    );
+    window.dispatchEvent(new CustomEvent("ordersUpdated", { detail: allOrders }));
 
+    // تحديث الأرقام في اللوحة العلويّة
     updateElementText("pendingCount", pending);
     updateElementText("shippingCount", shipping);
     updateElementText("completedCount", completed);
 
+    // تحديث الرسوم البيانية إذا كانت الدالة موجودة
     if (typeof updateRealStats === "function") {
       updateRealStats("7days");
     }
   });
 }
 
+// 5. رسم جدول الطلبات
 function renderMainOrdersTable(orders) {
   const ordersBody = document.getElementById("ordersBody");
   if (!ordersBody) return;
@@ -90,20 +100,27 @@ function renderMainOrdersTable(orders) {
   orders.forEach((order) => {
     const id = order.id;
     const row = document.createElement("tr");
+    
+    // التعامل مع اختلاف مسميات الحقول في قاعدة البيانات
+    const totalPrice = order.totalPrice || order.totalAmount || 0;
+    const customerName = order.customerName || order.customerInfo?.name || "زائر";
+    const customerPhone = order.customerPhone || order.customerInfo?.phone || "---";
+    const itemsCount = (order.cartItems || order.items)?.length || 0;
+
     row.innerHTML = `
             <td><span class="ref-badge">${order.referenceCode || id.substring(0, 6)}</span></td>
             <td>
                 <div class="customer-info">
-                    <strong>${order.customerName || order.customerInfo?.name || "زائر"}</strong><br>
-                    <small>${order.customerPhone || order.customerInfo?.phone || ""}</small>
+                    <strong>${customerName}</strong><br>
+                    <small>${customerPhone}</small>
                 </div>
             </td>
             <td>
                 <button class="view-items-btn" onclick="alert('${escapeHTML(formatItems(order.cartItems || order.items))}')">
-                     ${(order.cartItems || order.items)?.length || 0} منتجات
+                     ${itemsCount} منتجات
                 </button>
             </td>
-            <td class="price-cell">${Number(order.totalPrice || order.totalAmount || 0).toLocaleString()} ج.م</td>
+            <td class="price-cell">${Number(totalPrice).toLocaleString()} ج.م</td>
             <td><span class="status-tag ${order.status}">${translateStatus(order.status)}</span></td>
             <td>${order.estimatedArrival || "---"}</td>
             <td class="actions-cell">
@@ -121,15 +138,21 @@ function renderMainOrdersTable(orders) {
   });
 }
 
+// 6. دوال مساعدة للواجهة
 function updateElementText(id, text) {
   const el = document.getElementById(id);
   if (el) el.innerText = text;
 }
 
-// دالة إعداد المستمعات (لضمان أنها تعمل بعد تحميل الـ DOM)
 function setupEventListeners() {
-  const closeBtn = document.querySelector(".close-modal");
-  if (closeBtn) closeBtn.onclick = window.closeModal;
+  // إغلاق المودال عند الضغط على X
+  document.querySelectorAll(".close-modal").forEach(btn => {
+      btn.onclick = () => {
+          window.closeModal();
+          const detailsModal = document.getElementById("detailsModal");
+          if(detailsModal) detailsModal.style.display = "none";
+      };
+  });
 
   const editForm = document.getElementById("editOrderForm");
   if (editForm) {
@@ -146,7 +169,6 @@ function setupEventListeners() {
           status: newStatus,
           estimatedArrival: etaVal ? `${etaVal} أيام` : "لم يحدد",
         });
-        console.log("✅ تم التحديث في Firebase");
         window.closeModal();
       } catch (err) {
         console.error("Error updating order:", err);
@@ -156,6 +178,7 @@ function setupEventListeners() {
   }
 }
 
+// 7. وظائف المودال (النافذة المنبثقة)
 window.openEditModal = (id, currentStatus, currentEta) => {
   currentEditingId = id;
   const modalId = document.getElementById("modalOrderId");
@@ -177,6 +200,7 @@ window.closeModal = () => {
   if (modal) modal.style.display = "none";
 };
 
+// 8. المترجم والمنسق
 function translateStatus(s) {
   const map = {
     pending_payment: "انتظار الدفع",
@@ -184,6 +208,7 @@ function translateStatus(s) {
     shipped: "تم الشحن",
     on_the_way: "في الطريق",
     delivered: "وصل لحضراتكم",
+    pending: "قيد المراجعة"
   };
   return map[s] || s;
 }
@@ -195,19 +220,12 @@ function formatItems(items) {
 }
 
 function escapeHTML(str) {
-  return str?.replace(
-    /[&<>"']/g,
-    (m) =>
-      ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;",
-      })[m],
-  );
+  return str?.replace(/[&<>"']/g, m => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;",
+  })[m]);
 }
 
+// 9. عرض تفاصيل الطلب (Details Modal)
 document.addEventListener("click", (e) => {
   const btn = e.target.closest(".view-details");
   if (btn) {
@@ -225,25 +243,25 @@ function renderOrderDetails(order) {
   const content = document.getElementById("orderDetailsContent");
   if (!content) return;
 
-  const displayAddress =
-    order.address ||
-    (order.customerInfo && order.customerInfo.address) ||
-    order.customerCity ||
-    (order.customerInfo && order.customerInfo.city) ||
-    "غير مسجل";
+  const displayAddress = order.address || order.customerInfo?.address || order.customerCity || "غير مسجل";
 
   content.innerHTML = `
-        <div class="details-grid-wrapper" dir="rtl">
-            <div class="details-section">
-                <h4><i class="fas fa-user"></i> العميل</h4>
+        <div class="details-grid-wrapper" dir="rtl" style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; padding:10px;">
+            <div class="details-section" style="background:#151515; padding:15px; border-radius:8px; border:1px solid #333;">
+                <h4 style="color:#ffd700; border-bottom:1px solid #333; padding-bottom:8px; margin-bottom:12px;">
+                    <i class="fas fa-user"></i> بيانات العميل
+                </h4>
                 <p><strong>الاسم:</strong> ${order.customerName || order.customerInfo?.name || "غير متوفر"}</p>
                 <p><strong>الهاتف:</strong> ${order.customerPhone || order.customerInfo?.phone || "---"}</p>
-                <p><strong>العنوان:</strong> <span>${displayAddress}</span></p>
+                <p><strong>العنوان:</strong> <span style="color:#aaa;">${displayAddress}</span></p>
             </div>
-            <div class="details-section">
-                <h4><i class="fas fa-money-bill"></i> المالية</h4>
+            <div class="details-section" style="background:#151515; padding:15px; border-radius:8px; border:1px solid #333;">
+                <h4 style="color:#ffd700; border-bottom:1px solid #333; padding-bottom:8px; margin-bottom:12px;">
+                    <i class="fas fa-money-bill"></i> التفاصيل المالية
+                </h4>
                 <p><strong>الإجمالي:</strong> ${Number(order.totalPrice || order.totalAmount || 0).toLocaleString()} ج.م</p>
-                <p><strong>الحالة:</strong> ${translateStatus(order.status)}</p>
+                <p><strong>الحالة الحالية:</strong> <span class="status-tag ${order.status}">${translateStatus(order.status)}</span></p>
+                <p><strong>تاريخ الطلب:</strong> ${order.createdAt?.toDate ? order.createdAt.toDate().toLocaleString('ar-EG') : "---"}</p>
             </div>
         </div>
     `;
